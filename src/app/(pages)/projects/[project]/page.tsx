@@ -250,19 +250,15 @@ export default function ProjectDetail() {
       ? (over.id as Task["status"])
       : overTask?.status ?? activeTask.status;
 
-    // Remove the active task from the current position
     const updatedTasks = [...tasks].filter((t) => t.id !== active.id);
 
-    // Find the index where we want to insert the task
     const overIndex = updatedTasks.findIndex((t) => t.id === over.id);
 
     const newTask = { ...activeTask, status: newStatus };
 
     if (isDroppingOnColumn || overIndex === -1) {
-      // Drop at the end of the column
       updatedTasks.push(newTask);
     } else {
-      // Insert at the specific position
       updatedTasks.splice(overIndex, 0, newTask);
     }
 

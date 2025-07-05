@@ -1,5 +1,5 @@
 import * as React from "react";
-import { GalleryVerticalEnd } from "lucide-react";
+import { FolderKanban } from "lucide-react";
 
 import {
   Sidebar,
@@ -31,7 +31,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenuButton size="lg" asChild>
               <Link href="/dashboard">
                 <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <GalleryVerticalEnd className="size-4" />
+                  <FolderKanban className="size-4" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="font-medium">Project Management App</span>
@@ -45,6 +45,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu className="gap-2">
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link href="/dashboard" className="font-medium">
+                  Dashboard
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <Separator className="bg-border h-0.5" />
             <span className="px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Owned Projects
             </span>
@@ -62,7 +70,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
-            <Separator className="my-2 bg-black h-px" />
+            <Separator className="bg-border h-0.5" />
             <span className="px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Member Projects
             </span>
