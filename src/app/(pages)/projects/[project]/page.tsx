@@ -32,6 +32,7 @@ import { CreateTaskDialog } from "./components/CreateTaskDialog";
 import { TaskDetailDialog } from "./components/TaskDetailDialog";
 import { useUserStore } from "@/app/store/useUserStore";
 import { Button } from "@/components/ui/button";
+import TaskListener from "@/components/task-listener";
 
 export default function ProjectDetail() {
   const params = useParams();
@@ -151,6 +152,8 @@ export default function ProjectDetail() {
 
   return (
     <div className="p-6 space-y-6 w-full mx-auto">
+      <TaskListener />
+
       <ProjectHeader
         project={currentProject}
         tasks={tasks}
