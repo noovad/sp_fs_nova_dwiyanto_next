@@ -5,7 +5,6 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-  CardContent,
 } from "@/components/ui/card";
 import { Task } from "@/dto/dtos";
 import { getStatusColor } from "@/components/get-status-color";
@@ -40,23 +39,24 @@ export function TaskCard({ task }: TaskCardProps) {
       {...listeners}
       className="cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow"
     >
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-2 relative">
         <CardTitle className="text-base">{task.title}</CardTitle>
-        <CardDescription className="text-xs">
-          <span
-            className={`rounded px-2 py-0.5 text-xs font-medium ${getStatusColor(
-              task.status
-            )}`}
-          >
-            {task.status.replace("_", " ")}
-          </span>
+        <CardDescription className="text-xs flex flex-col gap-1">
+          {task.assignee?.email && (
+            <span className="text-xs text-muted-foreground">
+              {task.assignee.email}
+            </span>
+          )}
         </CardDescription>
+        <span
+          className={`absolute top-2 right-2 rounded px-2 py-0.5 text-xs font-medium whitespace-nowrap ${getStatusColor(
+            task.status
+          )}`}
+          style={{ width: "fit-content" }}
+        >
+          {task.status.replace("_", " ")}
+        </span>
       </CardHeader>
-      {task.description && (
-        <CardContent className="text-sm text-muted-foreground">
-          {task.description}
-        </CardContent>
-      )}
     </Card>
   );
 }

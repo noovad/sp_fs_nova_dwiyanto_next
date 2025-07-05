@@ -1,12 +1,20 @@
 export type Task = {
     id: string;
     title: string;
-    description?: string;
+    description?: string | null;
     status: "todo" | "in_progress" | "done";
     projectId: string;
     assigneeId: string;
     createdAt: string;
     updatedAt: string;
+    assignee: {
+        id: string;
+        email: string;
+    };
+    project: {
+        id: string;
+        name: string;
+    };
 };
 
 export type Owner = {

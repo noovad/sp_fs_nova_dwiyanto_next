@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -25,12 +26,19 @@ import { DroppableColumn } from "./components/DroppableColumn";
 import { DroppableContainer } from "./components/DroppableContainer";
 import { ProjectHeader } from "./components/ProjectHeader";
 import { useProjectStore } from "@/app/store/useProjectStore";
+import { useTaskStore } from "@/app/store/useTaskStore";
 import { getStatusColor } from "@/components/get-status-color";
+import { CreateTaskDialog } from "./components/CreateTaskDialog";
 
 export default function ProjectDetail() {
   const params = useParams();
-  const { getProjectBySlug, loading, currentProject } = useProjectStore();
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const getProjectBySlug = useProjectStore((state) => state.getProjectBySlug);
+  const projectLoading = useProjectStore((state) => state.loading);
+  const currentProject = useProjectStore((state) => state.currentProject);
+  const getAllTasks = useTaskStore((state) => state.getAllTasks);
+  const tasks = useTaskStore((state) => state.tasks);
+  const updateTask = useTaskStore((state) => state.updateTask);
+  const updateLocalTask = useTaskStore((state) => state.updateLocalTask);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
 
   const sensors = useSensors(
@@ -42,17 +50,17 @@ export default function ProjectDetail() {
   );
 
   useEffect(() => {
-    const fetchProject = async () => {
+    const fetchProjectAndTasks = async () => {
       if (params.project) {
         const project = await getProjectBySlug(params.project as string);
         if (project) {
-          setTasks(project.tasks);
+          await getAllTasks(project.id);
         }
       }
     };
 
-    fetchProject();
-  }, [params.project, getProjectBySlug]);
+    fetchProjectAndTasks();
+  }, [params.project]);
 
   const columns = {
     todo: tasks.filter((t) => t.status === "todo"),
@@ -65,7 +73,7 @@ export default function ProjectDetail() {
     setActiveTask(task || null);
   };
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveTask(null);
 
@@ -82,18 +90,18 @@ export default function ProjectDetail() {
       ? (over.id as Task["status"])
       : overTask?.status ?? activeTask.status;
 
-    const updatedTasks = [...tasks].filter((t) => t.id !== active.id);
-    const overIndex = updatedTasks.findIndex((t) => t.id === over.id);
-    const newTask = { ...activeTask, status: newStatus };
+    if (activeTask.status !== newStatus) {
+      updateLocalTask(activeTask.id, { status: newStatus });
 
-    if (isDroppingOnColumn || overIndex === -1) {
-      updatedTasks.push(newTask);
-    } else {
-      updatedTasks.splice(overIndex, 0, newTask);
+      const success = await updateTask(activeTask.id, { status: newStatus });
+
+      if (!success) {
+        updateLocalTask(activeTask.id, { status: activeTask.status });
+      }
     }
-
-    setTasks(updatedTasks);
   };
+
+  const loading = projectLoading;
 
   if (loading) {
     return (
@@ -122,6 +130,11 @@ export default function ProjectDetail() {
         tasks={tasks}
         projectSlug={params.project as string}
       />
+
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold">Tasks</h2>
+        <CreateTaskDialog project={currentProject} />
+      </div>
 
       <Separator />
 
