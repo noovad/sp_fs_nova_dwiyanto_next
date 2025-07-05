@@ -20,10 +20,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
 import { Plus } from "lucide-react";
 import { Project, Task } from "@/dto/dtos";
 import { toast } from "sonner";
 import { useTaskStore } from "@/app/store/useTaskStore";
+import { AssigneeInput } from "./AssigneeInput";
 
 interface CreateTaskDialogProps {
   project: Project;
@@ -36,14 +38,6 @@ export function CreateTaskDialog({ project }: CreateTaskDialogProps) {
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState<Task["status"]>("todo");
   const [assigneeId, setAssigneeId] = useState("");
-
-  const assignees = [
-    { id: project.ownerId, email: project.owner.email },
-    ...(project.memberships || []).map((member) => ({
-      id: member.id,
-      email: member.email,
-    })),
-  ];
 
   const handleSubmit = async () => {
     if (!title.trim() || !assigneeId) {
@@ -119,22 +113,13 @@ export function CreateTaskDialog({ project }: CreateTaskDialogProps) {
             </Select>
           </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="task-assignee">Assignee *</Label>
-            <Select value={assigneeId} onValueChange={setAssigneeId}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select assignee" />
-              </SelectTrigger>
-              <SelectContent>
-                {assignees.map((assignee) => (
-                  <SelectItem key={assignee.id} value={assignee.id}>
-                    {assignee.email}
-                    {assignee.id === project.ownerId && " (Owner)"}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <AssigneeInput
+            project={project}
+            value={assigneeId}
+            onChange={setAssigneeId}
+            label="Assignee"
+            required
+          />
         </div>
         <DialogFooter>
           <Button

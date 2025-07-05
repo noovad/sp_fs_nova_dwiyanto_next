@@ -25,7 +25,6 @@ interface TaskState {
     currentTask: Task | null;
     getAllTasks: (id: string) => Promise<boolean>;
     createTask: (data: CreateTaskData) => Promise<Task | null>;
-    getTaskById: (id: string) => Promise<Task | null>;
     updateTask: (id: string, data: UpdateTaskData) => Promise<boolean>;
     updateLocalTask: (id: string, data: UpdateTaskData) => void;
     deleteTask: (id: string) => Promise<boolean>;
@@ -74,22 +73,6 @@ export const useTaskStore = create<TaskState>((set, get) => ({
         }
     },
 
-    getTaskById: async (id) => {
-        set({ loading: true });
-        try {
-            const response = await axiosApp.get(`/task/${id}`);
-            const task = response.data.data;
-            set({ currentTask: task });
-            return task;
-        } catch (error) {
-            const message = getErrorMessage(error, "Failed to fetch task.");
-            toast.error(message);
-            return null;
-        } finally {
-            set({ loading: false });
-        }
-    },
-
     updateLocalTask: (id, data) => {
         const tasks = get().tasks;
         const updatedTasks = tasks.map(task =>
@@ -108,6 +91,16 @@ export const useTaskStore = create<TaskState>((set, get) => ({
         try {
             await axiosApp.put(`/task/${id}`, data);
             toast.success("Task updated successfully");
+            const tasks = get().tasks.map(task =>
+                task.id === id ? { ...task, ...data } : task
+            );
+            set({ tasks });
+
+            const currentTask = get().currentTask;
+            if (currentTask && currentTask.id === id) {
+                set({ currentTask: { ...currentTask, ...data } });
+            }
+
             return true;
         } catch (error) {
             const message = getErrorMessage(error, "Failed to update task.");

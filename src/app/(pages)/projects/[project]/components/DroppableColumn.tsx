@@ -23,6 +23,7 @@ interface DroppableColumnProps {
   tasks: Task[];
   title: string;
   count: number;
+  onTaskClick?: (task: Task) => void;
 }
 
 export function DroppableColumn({
@@ -30,6 +31,7 @@ export function DroppableColumn({
   tasks,
   title,
   count,
+  onTaskClick,
 }: DroppableColumnProps) {
   return (
     <div className="space-y-2">
@@ -42,14 +44,14 @@ export function DroppableColumn({
         </CardHeader>
       </Card>
 
-      <ScrollArea className="h-[500px] p-2 bg-white rounded-lg">
+      <ScrollArea className="h-[800px] p-2 bg-white rounded-lg">
         <SortableContext
           items={tasks.map((t) => t.id)}
           strategy={verticalListSortingStrategy}
         >
           <div className="space-y-3 min-h-[400px]">
             {tasks.map((task) => (
-              <TaskCard key={task.id} task={task} />
+              <TaskCard key={task.id} task={task} onTaskClick={onTaskClick} />
             ))}
             {tasks.length === 0 && (
               <div className="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center h-32 flex items-center justify-center">

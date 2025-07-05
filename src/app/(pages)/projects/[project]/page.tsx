@@ -29,6 +29,7 @@ import { useProjectStore } from "@/app/store/useProjectStore";
 import { useTaskStore } from "@/app/store/useTaskStore";
 import { getStatusColor } from "@/components/get-status-color";
 import { CreateTaskDialog } from "./components/CreateTaskDialog";
+import { TaskDetailDialog } from "./components/TaskDetailDialog";
 
 export default function ProjectDetail() {
   const params = useParams();
@@ -40,6 +41,8 @@ export default function ProjectDetail() {
   const updateTask = useTaskStore((state) => state.updateTask);
   const updateLocalTask = useTaskStore((state) => state.updateLocalTask);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -101,6 +104,11 @@ export default function ProjectDetail() {
     }
   };
 
+  const handleTaskClick = (task: Task) => {
+    setSelectedTask(task);
+    setIsTaskDialogOpen(true);
+  };
+
   const loading = projectLoading;
 
   if (loading) {
@@ -151,6 +159,7 @@ export default function ProjectDetail() {
               tasks={columns.todo}
               title="To do"
               count={columns.todo.length}
+              onTaskClick={handleTaskClick}
             />
           </DroppableContainer>
           <DroppableContainer id="in_progress">
@@ -159,6 +168,7 @@ export default function ProjectDetail() {
               tasks={columns.in_progress}
               title="In Progress"
               count={columns.in_progress.length}
+              onTaskClick={handleTaskClick}
             />
           </DroppableContainer>
           <DroppableContainer id="done">
@@ -167,6 +177,7 @@ export default function ProjectDetail() {
               tasks={columns.done}
               title="Done"
               count={columns.done.length}
+              onTaskClick={handleTaskClick}
             />
           </DroppableContainer>
         </div>
@@ -195,6 +206,13 @@ export default function ProjectDetail() {
           ) : null}
         </DragOverlay>
       </DndContext>
+
+      <TaskDetailDialog
+        task={selectedTask}
+        project={currentProject}
+        isOpen={isTaskDialogOpen}
+        onOpenChange={setIsTaskDialogOpen}
+      />
     </div>
   );
 }

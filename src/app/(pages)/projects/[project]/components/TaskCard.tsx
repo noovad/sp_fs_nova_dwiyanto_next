@@ -8,12 +8,14 @@ import {
 } from "@/components/ui/card";
 import { Task } from "@/dto/dtos";
 import { getStatusColor } from "@/components/get-status-color";
+import { cn } from "@/lib/utils";
 
 interface TaskCardProps {
   task: Task;
+  onTaskClick?: (task: Task) => void;
 }
 
-export function TaskCard({ task }: TaskCardProps) {
+export function TaskCard({ task, onTaskClick }: TaskCardProps) {
   const {
     attributes,
     listeners,
@@ -31,6 +33,13 @@ export function TaskCard({ task }: TaskCardProps) {
     opacity: isDragging ? 0.5 : 1,
   };
 
+  const handleClick = (e: React.MouseEvent) => {
+    if (onTaskClick && !isDragging) {
+      e.stopPropagation();
+      onTaskClick(task);
+    }
+  };
+
   return (
     <Card
       ref={setNodeRef}
@@ -38,24 +47,31 @@ export function TaskCard({ task }: TaskCardProps) {
       {...attributes}
       {...listeners}
       className="cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow"
+      onClick={handleClick}
     >
-      <CardHeader className="pb-2 relative">
-        <CardTitle className="text-base">{task.title}</CardTitle>
-        <CardDescription className="text-xs flex flex-col gap-1">
-          {task.assignee?.email && (
-            <span className="text-xs text-muted-foreground">
-              {task.assignee.email}
+      <CardHeader className="pb-3 pt-3">
+        <div className="space-y-2">
+          <div className="flex items-start justify-between gap-2">
+            <CardTitle className="text-sm font-medium leading-tight line-clamp-2">
+              {task.title}
+            </CardTitle>
+            <span
+              className={cn(
+                "rounded-full px-2 py-1 text-xs font-medium shrink-0",
+                getStatusColor(task.status)
+              )}
+            >
+              {task.status.replace("_", " ")}
             </span>
+          </div>
+
+          {task.assignee?.email && (
+            <CardDescription className="text-xs text-muted-foreground flex items-center gap-1">
+              <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+              <span className="truncate">{task.assignee.email}</span>
+            </CardDescription>
           )}
-        </CardDescription>
-        <span
-          className={`absolute top-2 right-2 rounded px-2 py-0.5 text-xs font-medium whitespace-nowrap ${getStatusColor(
-            task.status
-          )}`}
-          style={{ width: "fit-content" }}
-        >
-          {task.status.replace("_", " ")}
-        </span>
+        </div>
       </CardHeader>
     </Card>
   );
