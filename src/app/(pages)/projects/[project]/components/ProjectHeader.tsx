@@ -7,12 +7,14 @@ interface ProjectHeaderProps {
   project: Project;
   tasks: Task[];
   projectSlug: string;
+  settingVisibility: boolean;
 }
 
 export function ProjectHeader({
   project,
   tasks,
   projectSlug,
+  settingVisibility,
 }: ProjectHeaderProps) {
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
@@ -39,9 +41,13 @@ export function ProjectHeader({
           </span>
         </div>
       </div>
-      <Button asChild variant="outline" className="mt-4 md:mt-0">
-        <Link href={`/projects/${projectSlug}/settings`}>Project Settings</Link>
-      </Button>
+      {settingVisibility && (
+        <Button asChild variant="outline" className="mt-4 md:mt-0">
+          <Link href={`/projects/${projectSlug}/settings`}>
+            Project Settings
+          </Link>
+        </Button>
+      )}
     </div>
   );
 }

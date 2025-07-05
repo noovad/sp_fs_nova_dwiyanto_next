@@ -70,7 +70,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="w-full max-w-6xl p-6 space-y-6">
+    <div className="w-full p-6 space-y-6">
       <TaskAnalyticsChart data={analyticsData} />
       <div className="flex justify-between items-center">
         <h1 className="text-xl font-semibold">Your Projects</h1>

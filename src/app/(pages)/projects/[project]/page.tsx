@@ -30,6 +30,7 @@ import { useTaskStore } from "@/app/store/useTaskStore";
 import { getStatusColor } from "@/components/get-status-color";
 import { CreateTaskDialog } from "./components/CreateTaskDialog";
 import { TaskDetailDialog } from "./components/TaskDetailDialog";
+import { useUserStore } from "@/app/store/useUserStore";
 
 export default function ProjectDetail() {
   const params = useParams();
@@ -39,6 +40,8 @@ export default function ProjectDetail() {
   const tasks = useTaskStore((state) => state.tasks);
   const updateTask = useTaskStore((state) => state.updateTask);
   const updateLocalTask = useTaskStore((state) => state.updateLocalTask);
+  const me = useUserStore((state) => state.me);
+  const getMe = useUserStore((state) => state.getMe);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
@@ -52,17 +55,24 @@ export default function ProjectDetail() {
   );
 
   useEffect(() => {
-    const fetchProjectAndTasks = async () => {
+    const fetchData = async () => {
       if (params.project) {
         const project = await getProjectBySlug(params.project as string);
         if (project) {
           await getAllTasks(project.id);
         }
       }
+
+      if (!me) {
+        await getMe();
+      }
     };
 
-    fetchProjectAndTasks();
+    fetchData();
   }, [params.project]);
+
+  const settingVisibility =
+    me && currentProject && me.id === currentProject.ownerId ? true : false;
 
   const columns = {
     todo: tasks.filter((t) => t.status === "todo"),
@@ -124,6 +134,7 @@ export default function ProjectDetail() {
         project={currentProject}
         tasks={tasks}
         projectSlug={params.project as string}
+        settingVisibility={settingVisibility}
       />
 
       <div className="flex justify-between items-center">

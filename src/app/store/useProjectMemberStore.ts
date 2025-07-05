@@ -25,8 +25,8 @@ interface ProjectMemberState {
     members: ProjectMember[];
     currentMember: ProjectMember | null;
     getAllProjectMembers: (projectId: string) => Promise<boolean>;
-    createProjectMember: (data: CreateProjectMemberData) => Promise<ProjectMember | null>;
-    getProjectMemberById: (id: string) => Promise<ProjectMember | null>;
+    createProjectMember: (data: CreateProjectMemberData) => Promise<boolean>;
+    getProjectMemberById: (id: string) => Promise<boolean>;
     deleteProjectMember: (id: string) => Promise<boolean>;
 }
 
@@ -56,21 +56,15 @@ export const useProjectMemberStore = create<ProjectMemberState>((set, get) => ({
         set({ loading: true });
         try {
             const response = await axiosApp.post("/project-member", data);
-            if (response.data.status === 201) {
-                const newMember = response.data.data;
-                console.log("New member added:", newMember);
-                toast.success("Project member added successfully");
-                const members = get().members;
-                set({ members: [...members, newMember] });
-                return newMember;
-            } else {
-                toast.error("Failed to add project member");
-                return null;
-            }
+            const newMember = response.data.data;
+            toast.success("Project member added successfully");
+            const members = get().members;
+            set({ members: [...members, newMember] });
+            return true;
         } catch (error) {
             const message = getErrorMessage(error, "Failed to add project member.");
             toast.error(message);
-            return null;
+            return false;
         } finally {
             set({ loading: false });
         }
@@ -80,18 +74,13 @@ export const useProjectMemberStore = create<ProjectMemberState>((set, get) => ({
         set({ loading: true });
         try {
             const response = await axiosApp.get(`/project-member/${id}`);
-            if (response.data.status === 200) {
-                const member = response.data.data;
-                set({ currentMember: member });
-                return member;
-            } else {
-                toast.error("Failed to fetch project member");
-                return null;
-            }
+            const member = response.data.data;
+            set({ currentMember: member });
+            return true;
         } catch (error) {
             const message = getErrorMessage(error, "Failed to fetch project member.");
             toast.error(message);
-            return null;
+            return false;
         } finally {
             set({ loading: false });
         }
@@ -100,20 +89,15 @@ export const useProjectMemberStore = create<ProjectMemberState>((set, get) => ({
     deleteProjectMember: async (id) => {
         set({ loading: true });
         try {
-            const response = await axiosApp.delete(`/project-member/${id}`);
-            if (response.data.status === 200) {
-                toast.success("Project member removed successfully");
-                const members = get().members.filter(member => member.id !== id);
-                set({ members });
-                const currentMember = get().currentMember;
-                if (currentMember && currentMember.id === id) {
-                    set({ currentMember: null });
-                }
-                return true;
-            } else {
-                toast.error("Failed to remove project member");
-                return false;
+            await axiosApp.delete(`/project-member/${id}`);
+            toast.success("Project member removed successfully");
+            const members = get().members.filter(member => member.id !== id);
+            set({ members });
+            const currentMember = get().currentMember;
+            if (currentMember && currentMember.id === id) {
+                set({ currentMember: null });
             }
+            return true;
         } catch (error) {
             const message = getErrorMessage(error, "Failed to remove project member.");
             toast.error(message);

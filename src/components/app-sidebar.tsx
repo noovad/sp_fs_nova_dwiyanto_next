@@ -17,16 +17,30 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/app/store/useAuthStore";
 import { useProjectStore } from "@/app/store/useProjectStore";
+import { useUserStore } from "@/app/store/useUserStore";
 import { useEffect } from "react";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { logout, loading } = useAuthStore();
   const { projects, getAllProjects } = useProjectStore();
+  const { me, getMe } = useUserStore();
   const router = useRouter();
 
   useEffect(() => {
-    getAllProjects();
-  }, [getAllProjects]);
+    const fetchData = async () => {
+      await getMe();
+      await getAllProjects();
+    };
+    fetchData();
+  }, [getAllProjects, getMe]);
+
+  const ownedProjects = projects.filter(
+    (project) => me?.id && project.ownerId === me.id
+  );
+
+  const memberProjects = projects.filter(
+    (project) => me?.id && project.ownerId !== me.id
+  );
 
   const handleLogout = async () => {
     const success = await logout();
@@ -64,23 +78,50 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-            <SidebarSeparator className="bg-border h-0.5" />
-            <span className="px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Projects
-            </span>
-            {projects.map((project) => (
-              <SidebarMenuItem key={project.id}>
-                <SidebarMenuButton asChild>
-                  <Link
-                    href={`/projects/${encodeURIComponent(
-                      project.name.toLowerCase().replace(/\s+/g, "-")
-                    )}`}
-                  >
-                    {project.name}
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
+
+            {ownedProjects.length > 0 && (
+              <>
+                <SidebarSeparator className="bg-border h-0.5" />
+                <span className="px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  My Projects ({ownedProjects.length})
+                </span>
+                {ownedProjects.map((project) => (
+                  <SidebarMenuItem key={project.id}>
+                    <SidebarMenuButton asChild>
+                      <Link
+                        href={`/projects/${encodeURIComponent(
+                          project.name.toLowerCase().replace(/\s+/g, "-")
+                        )}`}
+                      >
+                        {project.name}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </>
+            )}
+
+            {memberProjects.length > 0 && (
+              <>
+                <SidebarSeparator className="bg-border h-0.5" />
+                <span className="px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Shared Projects ({memberProjects.length})
+                </span>
+                {memberProjects.map((project) => (
+                  <SidebarMenuItem key={project.id}>
+                    <SidebarMenuButton asChild>
+                      <Link
+                        href={`/projects/${encodeURIComponent(
+                          project.name.toLowerCase().replace(/\s+/g, "-")
+                        )}`}
+                      >
+                        {project.name}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </>
+            )}
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>

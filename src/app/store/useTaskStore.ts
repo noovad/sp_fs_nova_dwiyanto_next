@@ -24,7 +24,7 @@ interface TaskState {
     tasks: Task[];
     currentTask: Task | null;
     getAllTasks: (id: string) => Promise<boolean>;
-    createTask: (data: CreateTaskData) => Promise<Task | null>;
+    createTask: (data: CreateTaskData) => Promise<boolean>;
     updateTask: (id: string, data: UpdateTaskData) => Promise<boolean>;
     updateLocalTask: (id: string, data: UpdateTaskData) => void;
     deleteTask: (id: string) => Promise<boolean>;
@@ -54,20 +54,15 @@ export const useTaskStore = create<TaskState>((set, get) => ({
         set({ loading: true });
         try {
             const response = await axiosApp.post("/task", data);
-            if (response.data.status === 201) {
-                const newTask = response.data.data;
-                toast.success("Task created successfully");
-                const tasks = get().tasks;
-                set({ tasks: [...tasks, newTask] });
-                return newTask;
-            } else {
-                toast.error("Failed to create task");
-                return null;
-            }
+            const newTask = response.data.data;
+            toast.success("Task created successfully");
+            const tasks = get().tasks;
+            set({ tasks: [...tasks, newTask] });
+            return true;
         } catch (error) {
             const message = getErrorMessage(error, "Failed to create task.");
             toast.error(message);
-            return null;
+            return false;
         } finally {
             set({ loading: false });
         }
