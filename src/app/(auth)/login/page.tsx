@@ -9,14 +9,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import Link from "next/link";
+import { useAuthStore } from "@/app/store/useAuthStore";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const { login, loading } = useAuthStore();
+  // const [email, setEmail] = useState("");
+  // const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("user@email.com");
+  const [password, setPassword] = useState("12312344");
   const [error, setError] = useState<string | null>(null);
   const [hasInteracted, setHasInteracted] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const validate = () => {
@@ -58,16 +61,9 @@ export default function LoginPage() {
       return;
     }
 
-    setLoading(true);
-
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Login:", { email, password });
+    const success = await login(email, password);
+    if (success) {
       router.push("/dashboard");
-    } catch {
-      setError("Login failed. Please try again.");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -121,13 +117,13 @@ export default function LoginPage() {
             </div>
 
             {hasInteracted && error && (
-              <p className="text-destructive text-sm">{error}</p>
+              <p className="text-destructive text-xs">{error}</p>
             )}
 
             <Button
               type="submit"
               className="w-full"
-              disabled={loading || (hasInteracted && !!error)}
+              disabled={loading || !hasInteracted || (hasInteracted && !!error)}
             >
               {loading ? "Signing in..." : "Sign In"}
             </Button>

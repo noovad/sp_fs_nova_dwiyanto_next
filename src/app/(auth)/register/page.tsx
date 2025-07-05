@@ -9,15 +9,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import Link from "next/link";
+import { useAuthStore } from "@/app/store/useAuthStore";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const { register, loading } = useAuthStore();
+  const [email, setEmail] = useState("user@email.com");
+  const [password, setPassword] = useState("12312344");
+  const [confirmPassword, setConfirmPassword] = useState("12312344");
   const [error, setError] = useState<string | null>(null);
   const [hasInteracted, setHasInteracted] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const validate = () => {
@@ -69,16 +70,9 @@ export default function RegisterPage() {
       return;
     }
 
-    setLoading(true);
-
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Register:", { name, email, password });
-      router.push("/login");
-    } catch {
-      setError("Registration failed. Please try again.");
-    } finally {
-      setLoading(false);
+    const success = await register(email, password);
+    if (success) {
+      router.push("/dashboard");
     }
   };
 
@@ -154,7 +148,7 @@ export default function RegisterPage() {
             <Button
               type="submit"
               className="w-full"
-              disabled={loading || (hasInteracted && !!error)}
+              disabled={loading || !hasInteracted || (hasInteracted && !!error)}
             >
               {loading ? "Creating Account..." : "Create Account"}
             </Button>

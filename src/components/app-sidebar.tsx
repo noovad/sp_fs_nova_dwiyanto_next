@@ -1,5 +1,7 @@
+"use client";
+
 import * as React from "react";
-import { FolderKanban } from "lucide-react";
+import { FolderKanban, LogOut } from "lucide-react";
 
 import {
   Sidebar,
@@ -10,8 +12,11 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarSeparator,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/app/store/useAuthStore";
 
 const data = [
   {
@@ -23,6 +28,16 @@ const data = [
 ];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { logout, loading } = useAuthStore();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    const success = await logout();
+    if (success) {
+      router.push("/login");
+    }
+  };
+
   return (
     <Sidebar variant="floating" {...props}>
       <SidebarHeader>
@@ -91,6 +106,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={handleLogout} disabled={loading}>
+              <LogOut className="size-4" />
+              {loading ? "Logging out..." : "Logout"}
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }
