@@ -15,12 +15,10 @@ import Link from "next/link";
 
 const data = [
   {
-    title: "Installation",
-    url: "#",
+    name: "Installation",
   },
   {
-    title: "Project Structure",
-    url: "#",
+    name: "Project Structure",
   },
 ];
 
@@ -31,17 +29,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="#">
+              <Link href="/dashboard">
                 <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                   <GalleryVerticalEnd className="size-4" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-medium">
-                    <Link href="/dashboard">Project Management App</Link>
-                  </span>
+                  <span className="font-medium">Project Management App</span>
                   <span className="">v1.0.0</span>
                 </div>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -53,11 +49,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               Owned Projects
             </span>
             {data.map((item) => (
-              <SidebarMenuItem key={item.title}>
+              <SidebarMenuItem key={item.name}>
                 <SidebarMenuButton asChild>
-                  <a href={item.url} className="font-medium">
-                    {item.title}
-                  </a>
+                  <Link
+                    href={`/projects/${encodeURIComponent(
+                      item.name.toLowerCase().replace(/\s+/g, "-")
+                    )}`}
+                    className="font-medium"
+                  >
+                    {item.name}
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
@@ -66,11 +67,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               Member Projects
             </span>
             {data.map((item) => (
-              <SidebarMenuItem key={item.title}>
+              <SidebarMenuItem key={item.name}>
                 <SidebarMenuButton asChild>
-                  <a href={item.url} className="font-medium">
-                    {item.title}
-                  </a>
+                  <Link
+                    href={`/projects/${encodeURIComponent(
+                      item.name.toLowerCase().replace(/\s+/g, "-")
+                    )}`}
+                    className="font-medium"
+                  >
+                    {item.name}
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
