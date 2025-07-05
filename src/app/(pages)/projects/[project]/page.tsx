@@ -120,11 +120,14 @@ export default function ProjectDetail() {
     setIsTaskDialogOpen(true);
   };
 
-  const exportProjectAsJson = () => {
-    if (!currentProject) return;
+  const exportProjectAsJson = async () => {
+    if (!params.project) return;
+
+    const latestProject = await getProjectBySlug(params.project as string);
+    if (!latestProject) return;
 
     const exportData = {
-      project: currentProject,
+      project: latestProject,
     };
 
     const jsonString = JSON.stringify(exportData, null, 2);
@@ -133,7 +136,7 @@ export default function ProjectDetail() {
 
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${currentProject.name
+    a.download = `${latestProject.name
       .toLowerCase()
       .replace(/\s+/g, "-")}-export.json`;
     a.click();
