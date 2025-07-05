@@ -9,8 +9,8 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarSeparator,
 } from "@/components/ui/sidebar";
-import { Separator } from "@radix-ui/react-separator";
 import Link from "next/link";
 
 const data = [
@@ -52,7 +52,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-            <Separator className="bg-border h-0.5" />
+            <SidebarSeparator className="bg-border h-0.5" />
             <span className="px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Owned Projects
             </span>
@@ -70,7 +70,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
-            <Separator className="bg-border h-0.5" />
+            <SidebarSeparator className="bg-border h-0.5" />
             <span className="px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Member Projects
             </span>
