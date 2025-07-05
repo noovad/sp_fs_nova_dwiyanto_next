@@ -24,6 +24,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         set({ loading: true });
         try {
             const response = await axiosApp.get("/projects");
+            console.log(response.data.data)
             set({ projects: response.data.data });
             return true;
         } catch (error) {

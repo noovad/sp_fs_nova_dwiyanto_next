@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { FolderKanban, LogOut } from "lucide-react";
 
 import {
@@ -17,19 +16,17 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/app/store/useAuthStore";
-
-const data = [
-  {
-    name: "Installation",
-  },
-  {
-    name: "Project Structure",
-  },
-];
+import { useProjectStore } from "@/app/store/useProjectStore";
+import { useEffect } from "react";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { logout, loading } = useAuthStore();
+  const { projects, getAllProjects } = useProjectStore();
   const router = useRouter();
+
+  useEffect(() => {
+    getAllProjects();
+  }, [getAllProjects]);
 
   const handleLogout = async () => {
     const success = await logout();
@@ -69,36 +66,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarMenuItem>
             <SidebarSeparator className="bg-border h-0.5" />
             <span className="px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Owned Projects
+              Projects
             </span>
-            {data.map((item) => (
-              <SidebarMenuItem key={item.name}>
+            {projects.map((project) => (
+              <SidebarMenuItem key={project.id}>
                 <SidebarMenuButton asChild>
                   <Link
                     href={`/projects/${encodeURIComponent(
-                      item.name.toLowerCase().replace(/\s+/g, "-")
+                      project.name.toLowerCase().replace(/\s+/g, "-")
                     )}`}
-                    className="font-medium"
                   >
-                    {item.name}
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-            <SidebarSeparator className="bg-border h-0.5" />
-            <span className="px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Member Projects
-            </span>
-            {data.map((item) => (
-              <SidebarMenuItem key={item.name}>
-                <SidebarMenuButton asChild>
-                  <Link
-                    href={`/projects/${encodeURIComponent(
-                      item.name.toLowerCase().replace(/\s+/g, "-")
-                    )}`}
-                    className="font-medium"
-                  >
-                    {item.name}
+                    {project.name}
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

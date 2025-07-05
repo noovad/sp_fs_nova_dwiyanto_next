@@ -14,10 +14,8 @@ import { useAuthStore } from "@/app/store/useAuthStore";
 export default function LoginPage() {
   const router = useRouter();
   const { login, loading } = useAuthStore();
-  // const [email, setEmail] = useState("");
-  // const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("user@email.com");
-  const [password, setPassword] = useState("12312344");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [hasInteracted, setHasInteracted] = useState(false);
 

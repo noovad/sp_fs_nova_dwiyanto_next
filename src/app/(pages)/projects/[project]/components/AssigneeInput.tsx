@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import {
   Command,
@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Project } from "@/dto/dtos";
+import { useProjectMemberStore } from "@/app/store/useProjectMemberStore";
 
 interface AssigneeInputProps {
   project: Project;
@@ -42,13 +43,19 @@ export function AssigneeInput({
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
 
+  const { members, loading, getAllProjectMembers } = useProjectMemberStore();
+
+  useEffect(() => {
+    getAllProjectMembers(project.id);
+  }, [project.id, getAllProjectMembers]);
+
   const assignees = [
     { id: project.ownerId, email: project.owner?.email || "" },
-    ...(project.memberships || [])
-      .filter((member) => member.email)
+    ...members
+      .filter((member) => member.user?.email)
       .map((member) => ({
-        id: member.id,
-        email: member.email,
+        id: member.userId,
+        email: member.user!.email,
       })),
   ].filter((assignee) => assignee.email);
 
@@ -77,7 +84,8 @@ export function AssigneeInput({
             value={selectedAssignee?.email ?? ""}
             onClick={() => setOpen(true)}
             readOnly
-            placeholder={placeholder}
+            placeholder={loading ? "Loading..." : placeholder}
+            disabled={loading}
           />
         </PopoverTrigger>
 
@@ -89,7 +97,9 @@ export function AssigneeInput({
               onValueChange={setSearch}
             />
             <CommandList>
-              <CommandEmpty>No assignee found.</CommandEmpty>
+              <CommandEmpty>
+                {loading ? "Loading assignees..." : "No assignee found."}
+              </CommandEmpty>
               <CommandGroup>
                 {filtered.map((assignee) => (
                   <CommandItem

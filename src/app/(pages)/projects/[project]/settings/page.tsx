@@ -23,11 +23,8 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Trash2Icon } from "lucide-react";
 import { useProjectStore } from "@/app/store/useProjectStore";
-
-type Member = {
-  id: string;
-  email: string;
-};
+import { InviteMemberInput } from "./components/InviteMemberInput";
+import { useProjectMemberStore } from "@/app/store/useProjectMemberStore";
 
 export default function ProjectSettings() {
   const params = useParams();
@@ -40,43 +37,47 @@ export default function ProjectSettings() {
     currentProject,
   } = useProjectStore();
 
+  const {
+    members,
+    loading: memberLoading,
+    getAllProjectMembers,
+    createProjectMember,
+    deleteProjectMember,
+  } = useProjectMemberStore();
+
+
   const [projectName, setProjectName] = useState("");
   const [originalProjectName, setOriginalProjectName] = useState("");
-  const [members, setMembers] = useState<Member[]>([]);
-  const [inviteEmail, setInviteEmail] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const hasChanges = projectName !== originalProjectName;
 
   useEffect(() => {
-    const fetchProject = async () => {
+    const fetchData = async () => {
       if (params.project) {
         const project = await getProjectBySlug(params.project as string);
         if (project) {
           setProjectName(project.name);
           setOriginalProjectName(project.name);
-          setMembers(project.memberships || []);
+          await getAllProjectMembers(project.id);
         }
       }
     };
 
-    fetchProject();
-  }, [params.project, getProjectBySlug]);
+    fetchData();
+  }, [params.project, getProjectBySlug, getAllProjectMembers]);
 
-  const removeMember = (id: string) => {
-    setMembers(members.filter((member) => member.id !== id));
+  const removeMember = async (id: string) => {
+    await deleteProjectMember(id);
   };
 
-  const handleInvite = () => {
-    if (!inviteEmail.trim()) return;
+  const handleInvite = async (email: string) => {
+    if (!currentProject) return;
 
-    const newMember: Member = {
-      id: crypto.randomUUID(),
-      email: inviteEmail.trim(),
-    };
-
-    setMembers([...members, newMember]);
-    setInviteEmail("");
+    await createProjectMember({
+      projectId: currentProject.id,
+      email,
+    });
   };
 
   const handleSaveChanges = async () => {
@@ -171,13 +172,16 @@ export default function ProjectSettings() {
                   key={member.id}
                   className="flex justify-between items-center p-3 border rounded-lg bg-gray-50"
                 >
-                  <span className="text-sm font-medium">{member.email}</span>
+                  <span className="text-sm font-medium">
+                    {member.user?.email || "Unknown"}
+                  </span>
                   <Button
                     variant="destructive"
                     size="sm"
                     onClick={() => removeMember(member.id)}
+                    disabled={memberLoading}
                   >
-                    Remove
+                    {memberLoading ? "Removing..." : "Remove"}
                   </Button>
                 </div>
               ))}
@@ -198,20 +202,7 @@ export default function ProjectSettings() {
           <CardTitle>Invite New Member</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-2">
-            <Input
-              placeholder="Enter email address"
-              value={inviteEmail}
-              onChange={(e) => setInviteEmail(e.target.value)}
-              className="flex-1"
-            />
-            <Button
-              onClick={handleInvite}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              Invite
-            </Button>
-          </div>
+          <InviteMemberInput onInvite={handleInvite} loading={memberLoading} />
         </CardContent>
       </Card>
 
