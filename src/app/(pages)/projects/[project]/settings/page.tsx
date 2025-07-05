@@ -29,22 +29,23 @@ import { useProjectMemberStore } from "@/app/store/useProjectMemberStore";
 export default function ProjectSettings() {
   const params = useParams();
   const router = useRouter();
-  const {
-    getProjectBySlug,
-    updateProject,
-    deleteProject,
-    loading,
-    currentProject,
-  } = useProjectStore();
+  const getProjectBySlug = useProjectStore((state) => state.getProjectBySlug);
+  const updateProject = useProjectStore((state) => state.updateProject);
+  const deleteProject = useProjectStore((state) => state.deleteProject);
+  const loading = useProjectStore((state) => state.loading);
+  const currentProject = useProjectStore((state) => state.currentProject);
 
-  const {
-    members,
-    loading: memberLoading,
-    getAllProjectMembers,
-    createProjectMember,
-    deleteProjectMember,
-  } = useProjectMemberStore();
-
+  const members = useProjectMemberStore((state) => state.members);
+  const memberLoading = useProjectMemberStore((state) => state.loading);
+  const getAllProjectMembers = useProjectMemberStore(
+    (state) => state.getAllProjectMembers
+  );
+  const createProjectMember = useProjectMemberStore(
+    (state) => state.createProjectMember
+  );
+  const deleteProjectMember = useProjectMemberStore(
+    (state) => state.deleteProjectMember
+  );
 
   const [projectName, setProjectName] = useState("");
   const [originalProjectName, setOriginalProjectName] = useState("");

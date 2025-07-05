@@ -39,7 +39,10 @@ export function TaskDetailDialog({
   isOpen,
   onOpenChange,
 }: TaskDetailDialogProps) {
-  const { updateTask, deleteTask, loading } = useTaskStore();
+  const updateTask = useTaskStore((s) => s.updateTask);
+  const deleteTask = useTaskStore((s) => s.deleteTask);
+  const loading = useTaskStore((s) => s.loading);
+
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");

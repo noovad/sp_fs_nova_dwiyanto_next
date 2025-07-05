@@ -13,7 +13,8 @@ import { useAuthStore } from "@/app/store/useAuthStore";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, loading } = useAuthStore();
+  const login = useAuthStore((state) => state.login);
+  const loading = useAuthStore((state) => state.loading);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);

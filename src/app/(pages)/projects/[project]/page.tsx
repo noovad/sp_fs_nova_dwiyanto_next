@@ -34,7 +34,6 @@ import { TaskDetailDialog } from "./components/TaskDetailDialog";
 export default function ProjectDetail() {
   const params = useParams();
   const getProjectBySlug = useProjectStore((state) => state.getProjectBySlug);
-  const projectLoading = useProjectStore((state) => state.loading);
   const currentProject = useProjectStore((state) => state.currentProject);
   const getAllTasks = useTaskStore((state) => state.getAllTasks);
   const tasks = useTaskStore((state) => state.tasks);
@@ -108,18 +107,6 @@ export default function ProjectDetail() {
     setSelectedTask(task);
     setIsTaskDialogOpen(true);
   };
-
-  const loading = projectLoading;
-
-  if (loading) {
-    return (
-      <div className="p-6 space-y-6 max-w-7xl mx-auto">
-        <div className="flex items-center justify-center h-64">
-          <p className="text-muted-foreground">Loading project...</p>
-        </div>
-      </div>
-    );
-  }
 
   if (!currentProject) {
     return (

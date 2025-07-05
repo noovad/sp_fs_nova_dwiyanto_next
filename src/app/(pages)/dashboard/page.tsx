@@ -27,8 +27,10 @@ import { formatDate } from "@/lib/date";
 import { useProjectStore } from "@/app/store/useProjectStore";
 
 export default function DashboardPage() {
-  const { projects, loading, getAllProjects, createProject } =
-    useProjectStore();
+  const projects = useProjectStore((state) => state.projects);
+  const loading = useProjectStore((state) => state.loading);
+  const getAllProjects = useProjectStore((state) => state.getAllProjects);
+  const createProject = useProjectStore((state) => state.createProject);
   const [newProjectName, setNewProjectName] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 

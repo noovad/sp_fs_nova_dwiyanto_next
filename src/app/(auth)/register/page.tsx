@@ -13,7 +13,8 @@ import { useAuthStore } from "@/app/store/useAuthStore";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { register, loading } = useAuthStore();
+  const register = useAuthStore((state) => state.register);
+  const loading = useAuthStore((state) => state.loading);
   const [email, setEmail] = useState("user@email.com");
   const [password, setPassword] = useState("12312344");
   const [confirmPassword, setConfirmPassword] = useState("12312344");

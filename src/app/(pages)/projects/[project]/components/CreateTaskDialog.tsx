@@ -32,7 +32,8 @@ interface CreateTaskDialogProps {
 }
 
 export function CreateTaskDialog({ project }: CreateTaskDialogProps) {
-  const { createTask, loading } = useTaskStore();
+  const createTask = useTaskStore((state) => state.createTask);
+  const loading = useTaskStore((state) => state.loading);
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
