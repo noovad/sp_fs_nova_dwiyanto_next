@@ -127,6 +127,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
+          {me && (
+            <SidebarMenuItem>
+              <div className="px-3 text-sm text-muted-foreground">
+                <span className="font-medium text-foreground">{me.email}</span>
+              </div>
+            </SidebarMenuItem>
+          )}
           <SidebarMenuItem>
             <SidebarMenuButton onClick={handleLogout} disabled={loading}>
               <LogOut className="size-4" />

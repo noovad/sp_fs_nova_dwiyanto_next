@@ -36,7 +36,11 @@ export const useAuthStore = create<AuthState>((set) => ({
             return true;
         } catch (error) {
             const message = getErrorMessage(error, "Registration failed. Please try again.");
-            toast.error(message);
+            if (message.includes("Unique constraint failed")) {
+                toast.error("Email sudah terdaftar");
+            } else {
+                toast.error(message);
+            }
             return false;
         } finally {
             set({ loading: false });

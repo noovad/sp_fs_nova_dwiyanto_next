@@ -46,3 +46,18 @@ export type User = {
     createdAt: string;
     updatedAt: string;
 };
+
+export interface CreateTaskData {
+    projectId: string;
+    title: string;
+    assigneeId: string;
+    status: Task["status"];
+    description?: string;
+}
+
+export interface UpdateTaskData {
+    title?: string;
+    assigneeId?: string;
+    status?: Task["status"];
+    description?: string;
+}

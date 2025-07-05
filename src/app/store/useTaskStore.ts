@@ -2,22 +2,7 @@ import { create } from "zustand";
 import { toast } from "sonner";
 import axiosApp from "@/lib/axiosApp";
 import { getErrorMessage } from "@/lib/utils";
-import { Task } from "@/dto/dtos";
-
-interface CreateTaskData {
-    projectId: string;
-    title: string;
-    assigneeId: string;
-    status: Task["status"];
-    description?: string;
-}
-
-interface UpdateTaskData {
-    title?: string;
-    assigneeId?: string;
-    status?: Task["status"];
-    description?: string;
-}
+import { CreateTaskData, Task, UpdateTaskData } from "@/dto/dtos";
 
 interface TaskState {
     loading: boolean;

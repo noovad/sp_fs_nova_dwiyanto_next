@@ -31,6 +31,7 @@ import { getStatusColor } from "@/components/get-status-color";
 import { CreateTaskDialog } from "./components/CreateTaskDialog";
 import { TaskDetailDialog } from "./components/TaskDetailDialog";
 import { useUserStore } from "@/app/store/useUserStore";
+import { Button } from "@/components/ui/button";
 
 export default function ProjectDetail() {
   const params = useParams();
@@ -118,6 +119,26 @@ export default function ProjectDetail() {
     setIsTaskDialogOpen(true);
   };
 
+  const exportProjectAsJson = () => {
+    if (!currentProject) return;
+
+    const exportData = {
+      project: currentProject,
+    };
+
+    const jsonString = JSON.stringify(exportData, null, 2);
+    const blob = new Blob([jsonString], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${currentProject.name
+      .toLowerCase()
+      .replace(/\s+/g, "-")}-export.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   if (!currentProject) {
     return (
       <div className="p-6 space-y-6 max-w-7xl mx-auto">
@@ -139,7 +160,10 @@ export default function ProjectDetail() {
 
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">Tasks</h2>
-        <CreateTaskDialog project={currentProject} />
+        <div className="flex gap-2">
+          <Button onClick={exportProjectAsJson}>Export JSON</Button>
+          <CreateTaskDialog project={currentProject} />
+        </div>
       </div>
 
       <Separator />

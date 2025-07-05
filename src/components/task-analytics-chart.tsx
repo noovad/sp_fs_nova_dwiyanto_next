@@ -28,7 +28,7 @@ export default function TaskAnalyticsChart({ data }: TaskAnalyticsChartProps) {
   const [showChart, setShowChart] = useState(false);
 
   return (
-    <div className="w-full max-w-6xl mx-auto mb-6">
+    <div className="w-full mx-auto mb-6">
       <Button
         variant="outline"
         onClick={() => setShowChart((prev) => !prev)}
