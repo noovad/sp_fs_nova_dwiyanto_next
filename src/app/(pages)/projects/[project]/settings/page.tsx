@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -21,38 +22,46 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Trash2Icon } from "lucide-react";
+import { useProjectStore } from "@/app/store/useProjectStore";
 
 type Member = {
   id: string;
   email: string;
 };
 
-type Project = {
-  id: string;
-  name: string;
-  description: string;
-  members: Member[];
-};
-
-const dummyProject: Project = {
-  id: "1",
-  name: "Website Redesign",
-  description: "A revamp of the marketing site.",
-  members: [
-    { id: "u1", email: "alice@example.com" },
-    { id: "u2", email: "bob@example.com" },
-    { id: "u3", email: "charlie@example.com" },
-  ],
-};
-
 export default function ProjectSettings() {
-  const [projectName, setProjectName] = useState(dummyProject.name);
-  const [projectDescription, setProjectDescription] = useState(
-    dummyProject.description
-  );
-  const [members, setMembers] = useState(dummyProject.members);
+  const params = useParams();
+  const router = useRouter();
+  const {
+    getProjectBySlug,
+    updateProject,
+    deleteProject,
+    loading,
+    currentProject,
+  } = useProjectStore();
+
+  const [projectName, setProjectName] = useState("");
+  const [originalProjectName, setOriginalProjectName] = useState("");
+  const [members, setMembers] = useState<Member[]>([]);
   const [inviteEmail, setInviteEmail] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const hasChanges = projectName !== originalProjectName;
+
+  useEffect(() => {
+    const fetchProject = async () => {
+      if (params.project) {
+        const project = await getProjectBySlug(params.project as string);
+        if (project) {
+          setProjectName(project.name);
+          setOriginalProjectName(project.name);
+          setMembers(project.memberships || []);
+        }
+      }
+    };
+
+    fetchProject();
+  }, [params.project, getProjectBySlug]);
 
   const removeMember = (id: string) => {
     setMembers(members.filter((member) => member.id !== id));
@@ -70,14 +79,50 @@ export default function ProjectSettings() {
     setInviteEmail("");
   };
 
-  const handleSaveChanges = () => {
-    console.log("Saving changes:", { projectName, projectDescription });
+  const handleSaveChanges = async () => {
+    if (currentProject && hasChanges) {
+      const updated = await updateProject(currentProject.id, {
+        name: projectName,
+      });
+      if (updated) {
+        setOriginalProjectName(projectName);
+        const slug = encodeURIComponent(
+          projectName.toLowerCase().replace(/\s+/g, "-")
+        );
+        router.push(`/projects/${slug}/settings`);
+      }
+    }
   };
 
-  const handleDeleteProject = () => {
-    alert("Project deleted");
-    setShowDeleteConfirm(false);
+  const handleDeleteProject = async () => {
+    if (currentProject) {
+      const success = await deleteProject(currentProject.id);
+      if (success) {
+        setShowDeleteConfirm(false);
+        router.push("/dashboard");
+      }
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto p-6 space-y-8">
+        <div className="flex items-center justify-center h-64">
+          <p className="text-muted-foreground">Loading project settings...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentProject) {
+    return (
+      <div className="max-w-4xl mx-auto p-6 space-y-8">
+        <div className="flex items-center justify-center h-64">
+          <p className="text-muted-foreground">Project not found</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
@@ -102,22 +147,14 @@ export default function ProjectSettings() {
               placeholder="Enter project name"
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="desc">Description</Label>
-            <Input
-              id="desc"
-              value={projectDescription}
-              onChange={(e) => setProjectDescription(e.target.value)}
-              placeholder="Enter project description"
-            />
-          </div>
         </CardContent>
         <CardFooter>
           <Button
             onClick={handleSaveChanges}
+            disabled={loading || !hasChanges || !projectName.trim()}
             className="bg-blue-600 hover:bg-blue-700"
           >
-            Save Changes
+            {loading ? "Saving..." : "Save Changes"}
           </Button>
         </CardFooter>
       </Card>
@@ -218,8 +255,12 @@ export default function ProjectSettings() {
                   >
                     Cancel
                   </Button>
-                  <Button variant="destructive" onClick={handleDeleteProject}>
-                    Confirm Delete
+                  <Button
+                    variant="destructive"
+                    onClick={handleDeleteProject}
+                    disabled={loading}
+                  >
+                    {loading ? "Deleting..." : "Confirm Delete"}
                   </Button>
                 </DialogFooter>
               </DialogContent>
