@@ -16,7 +16,6 @@ interface CreateUserData {
 }
 
 interface UserState {
-    loading: boolean;
     users: User[];
     currentUser: User | null;
     me: User | null;
@@ -26,13 +25,11 @@ interface UserState {
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
-    loading: false,
     users: [],
     currentUser: null,
     me: null,
 
     createUser: async (data) => {
-        set({ loading: true });
         try {
             const response = await axiosApp.post("/user", data);
             const newUser = response.data.data;
@@ -45,13 +42,10 @@ export const useUserStore = create<UserState>((set, get) => ({
             const message = getErrorMessage(error, "Failed to create user.");
             toast.error(message);
             return false;
-        } finally {
-            set({ loading: false });
         }
     },
 
     deleteUser: async (id) => {
-        set({ loading: true });
         try {
             await axiosApp.delete(`/user/${id}`);
             toast.success("User deleted successfully");
@@ -67,8 +61,6 @@ export const useUserStore = create<UserState>((set, get) => ({
             const message = getErrorMessage(error, "Failed to delete user.");
             toast.error(message);
             return false;
-        } finally {
-            set({ loading: false });
         }
     },
 
@@ -82,8 +74,6 @@ export const useUserStore = create<UserState>((set, get) => ({
             const message = getErrorMessage(error, "Failed to fetch user data.");
             toast.error(message);
             return false;
-        } finally {
-            set({ loading: false });
         }
     }
 }));
