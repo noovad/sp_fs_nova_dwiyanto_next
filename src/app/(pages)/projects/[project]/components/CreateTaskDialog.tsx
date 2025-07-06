@@ -41,8 +41,10 @@ export function CreateTaskDialog({ project }: CreateTaskDialogProps) {
   const [assigneeId, setAssigneeId] = useState("");
 
   const handleSubmit = async () => {
-    if (!title.trim() || !assigneeId) {
-      toast.error("Please fill in all required fields");
+    if (!title.trim() || title.trim().length < 3 || !assigneeId) {
+      toast.error(
+        "Title must be at least 3 characters."
+      );
       return;
     }
 
