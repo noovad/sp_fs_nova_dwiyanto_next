@@ -15,9 +15,9 @@ export default function RegisterPage() {
   const router = useRouter();
   const register = useAuthStore((state) => state.register);
   const loading = useAuthStore((state) => state.loading);
-  const [email, setEmail] = useState("user@email.com");
-  const [password, setPassword] = useState("12312344");
-  const [confirmPassword, setConfirmPassword] = useState("12312344");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [hasInteracted, setHasInteracted] = useState(false);
 
